@@ -27,6 +27,13 @@
                     Contacts
                 </flux:navbar.item>
                 <flux:navbar.item 
+                    icon="cake" 
+                    href="{{ route('birthdays.index') }}"
+                    :current="request()->routeIs('birthdays.*')"
+                >
+                    Birthdays
+                </flux:navbar.item>
+                <flux:navbar.item 
                     icon="clipboard-document-list" 
                     href="{{ route('lists.index') }}"
                     :current="request()->routeIs('lists.*')"
@@ -81,6 +88,13 @@
                     :current="request()->routeIs('contacts.*')"
                 >
                     Contacts
+                </flux:sidebar.item>
+                <flux:sidebar.item 
+                    icon="cake" 
+                    href="{{ route('birthdays.index') }}"
+                    :current="request()->routeIs('birthdays.*')"
+                >
+                    Birthdays
                 </flux:sidebar.item>
                 <flux:sidebar.item 
                     icon="clipboard-document-list" 
