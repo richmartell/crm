@@ -9,25 +9,14 @@
         </flux:button>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <div class="lg:col-span-2">
-            <flux:input wire:model.live.debounce.400ms="search" placeholder="Search contacts..." icon="magnifying-glass" />
-        </div>
-        <div>
-            <flux:select wire:model.live="tagFilter" placeholder="Filter by tag">
-                <option value="">All tags</option>
-                @foreach($tags as $tag)
-                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                @endforeach
-            </flux:select>
-        </div>
-        <div>
-            <flux:select wire:model.live="sortField" label="Sort by">
-                <option value="first_name">First name</option>
-                <option value="last_name">Last name</option>
-                <option value="created_at">Created date</option>
-            </flux:select>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <flux:input wire:model.live.debounce.400ms="search" placeholder="Search contacts..." icon="magnifying-glass" />
+        <flux:select wire:model.live="tagFilter" placeholder="Filter by tag">
+            <option value="">All tags</option>
+            @foreach($tags as $tag)
+                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+            @endforeach
+        </flux:select>
     </div>
 
     @if($contacts->isEmpty())

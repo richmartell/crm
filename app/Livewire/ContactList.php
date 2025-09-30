@@ -14,8 +14,6 @@ class ContactList extends Component
     use WithPagination;
     public string $search = '';
     public ?int $tagFilter = null;
-    public string $sortField = 'last_name';
-    public string $sortDirection = 'asc';
 
     public function updatingSearch(): void
     {
@@ -25,16 +23,6 @@ class ContactList extends Component
     public function updatingTagFilter(): void
     {
         $this->resetPage();
-    }
-
-    public function sortBy(string $field): void
-    {
-        if ($this->sortField === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortField = $field;
-            $this->sortDirection = 'asc';
-        }
     }
 
     public function render()
@@ -51,7 +39,7 @@ class ContactList extends Component
                 });
             })
             ->when($this->tagFilter, fn ($query) => $query->whereHas('tags', fn ($tagQuery) => $tagQuery->where('tags.id', $this->tagFilter)))
-            ->orderBy($this->sortField, $this->sortDirection)
+            ->orderBy('first_name', 'asc')
             ->paginate(12);
 
         return view('livewire.contact-list', [
