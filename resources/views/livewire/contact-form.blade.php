@@ -100,9 +100,15 @@
                 @if($createNewAddress || $addresses->isEmpty() || $address_id)
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <flux:field class="md:col-span-2">
-                            <flux:label>Street</flux:label>
+                            <flux:label>Address Line 1</flux:label>
                             <flux:input wire:model="street" />
                             <flux:error name="street" />
+                        </flux:field>
+                        
+                        <flux:field class="md:col-span-2">
+                            <flux:label>Address Line 2</flux:label>
+                            <flux:input wire:model="address_line_2" placeholder="Apartment, suite, etc. (optional)" />
+                            <flux:error name="address_line_2" />
                         </flux:field>
                         
                         <flux:field>
@@ -119,7 +125,30 @@
                         
                         <flux:field class="md:col-span-2">
                             <flux:label>Country</flux:label>
-                            <flux:input wire:model="country" />
+                            <flux:select wire:model="country">
+                                <option value="">Select a country...</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="United States">United States</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Ireland">Ireland</option>
+                                <option value="New Zealand">New Zealand</option>
+                                <option value="France">France</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Spain">Spain</option>
+                                <option value="Italy">Italy</option>
+                                <option value="Netherlands">Netherlands</option>
+                                <option value="Belgium">Belgium</option>
+                                <option value="Switzerland">Switzerland</option>
+                                <option value="Austria">Austria</option>
+                                <option value="Portugal">Portugal</option>
+                                <option value="Sweden">Sweden</option>
+                                <option value="Norway">Norway</option>
+                                <option value="Denmark">Denmark</option>
+                                <option value="Finland">Finland</option>
+                                <option value="Poland">Poland</option>
+                                <option value="Other">Other</option>
+                            </flux:select>
                             <flux:error name="country" />
                         </flux:field>
                     </div>
@@ -130,13 +159,17 @@
             <div>
                 <flux:heading size="lg" class="mb-4">Visibility</flux:heading>
                 <flux:separator variant="subtle" class="mb-4" />
-                <flux:field variant="inline">
-                    <flux:checkbox wire:model="is_shared" />
-                    <div>
-                        <flux:label>Share this contact with other users</flux:label>
-                        <flux:description>Personal contacts are only visible to you. Shared contacts can be seen by all users.</flux:description>
+                <div class="flex items-start gap-3">
+                    <flux:checkbox wire:model="is_shared" id="is_shared" class="mt-1" />
+                    <div class="flex-1">
+                        <label for="is_shared" class="text-sm font-medium text-zinc-900 dark:text-white cursor-pointer">
+                            Share this contact with other users
+                        </label>
+                        <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                            Personal contacts are only visible to you. Shared contacts can be seen by all users.
+                        </p>
                     </div>
-                </flux:field>
+                </div>
             </div>
 
             <!-- Tags -->
@@ -145,20 +178,19 @@
                 <flux:separator variant="subtle" class="mb-4" />
                 <div class="flex flex-wrap gap-3">
                     @foreach($tags as $tag)
-                        <label class="inline-flex items-center cursor-pointer">
+                        <label class="cursor-pointer">
                             <input 
                                 type="checkbox" 
-                                wire:model="selectedTags" 
+                                wire:model.live="selectedTags" 
                                 value="{{ $tag->id }}" 
                                 class="sr-only peer"
-                            >
-                            <flux:badge 
-                                variant="pill"
-                                class="border-2 transition-all cursor-pointer peer-checked:border-current"
-                                style="color: {{ $tag->color }}; background-color: {{ in_array($tag->id, $selectedTags) ? $tag->color . '20' : 'transparent' }}; border-color: {{ $tag->color }}"
+                            />
+                            <span 
+                                class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium border-2 transition-all peer-checked:ring-2 peer-checked:ring-offset-2"
+                                style="color: {{ $tag->color }}; background-color: {{ in_array($tag->id, $selectedTags) ? $tag->color . '20' : 'transparent' }}; border-color: {{ $tag->color }}; ring-color: {{ $tag->color }};"
                             >
                                 {{ $tag->name }}
-                            </flux:badge>
+                            </span>
                         </label>
                     @endforeach
                 </div>

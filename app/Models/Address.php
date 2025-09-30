@@ -9,6 +9,7 @@ class Address extends Model
 {
     protected $fillable = [
         'street',
+        'address_line_2',
         'city',
         'postcode',
         'country',
@@ -20,6 +21,7 @@ class Address extends Model
     {
         $parts = array_filter([
             $this->street,
+            $this->address_line_2,
             $this->city,
             $this->postcode,
             $this->country,

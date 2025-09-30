@@ -31,6 +31,7 @@ class ContactForm extends Component
     // Address fields
     public $address_id = null;
     public $street = '';
+    public $address_line_2 = '';
     public $city = '';
     public $postcode = '';
     public $country = '';
@@ -60,6 +61,7 @@ class ContactForm extends Component
             if ($contact->address) {
                 $this->address_id = $contact->address_id;
                 $this->street = $contact->address->street;
+                $this->address_line_2 = $contact->address->address_line_2;
                 $this->city = $contact->address->city;
                 $this->postcode = $contact->address->postcode;
                 $this->country = $contact->address->country;
@@ -79,6 +81,7 @@ class ContactForm extends Component
             'notes' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
             'street' => 'nullable|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'postcode' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
@@ -92,10 +95,11 @@ class ContactForm extends Component
         // Handle address
         $addressId = $this->address_id;
         
-        if ($this->createNewAddress || ($this->street || $this->city || $this->postcode || $this->country)) {
+        if ($this->createNewAddress || ($this->street || $this->address_line_2 || $this->city || $this->postcode || $this->country)) {
             if (!$this->address_id || $this->createNewAddress) {
                 $address = Address::create([
                     'street' => $this->street,
+                    'address_line_2' => $this->address_line_2,
                     'city' => $this->city,
                     'postcode' => $this->postcode,
                     'country' => $this->country,
@@ -105,6 +109,7 @@ class ContactForm extends Component
                 // Update existing address
                 Address::find($this->address_id)->update([
                     'street' => $this->street,
+                    'address_line_2' => $this->address_line_2,
                     'city' => $this->city,
                     'postcode' => $this->postcode,
                     'country' => $this->country,
