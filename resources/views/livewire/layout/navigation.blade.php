@@ -2,6 +2,7 @@
 
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
+use Illuminate\Support\Str;
 
 new class extends Component
 {
@@ -38,32 +39,37 @@ new class extends Component
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
+                <flux:dropdown position="bottom" align="end">
+                    <flux:profile
+                        x-data="{ name: '{{ addslashes(auth()->user()->name) }}' }"
+                        x-on:profile-updated.window="name = $event.detail.name"
+                    >
+                        <x-slot name="name">{{ auth()->user()->name }}</x-slot>
+                    </flux:profile>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                    <flux:menu class="min-w-[12rem]">
+                        <div class="px-3 py-2">
+                            <flux:text size="sm" class="text-gray-500">{{ __('Signed in as') }}</flux:text>
+                            <flux:heading size="xs" class="mt-1 truncate">{{ auth()->user()->email }}</flux:heading>
+                        </div>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile')" wire:navigate>
+                        <flux:menu.separator />
+
+                        <flux:menu.item href="{{ route('profile') }}" icon="user" wire:navigate>
                             {{ __('Profile') }}
-                        </x-dropdown-link>
+                        </flux:menu.item>
 
-                        <!-- Authentication -->
-                        <button wire:click="logout" class="w-full text-start">
-                            <x-dropdown-link>
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </button>
-                    </x-slot>
-                </x-dropdown>
+                        <flux:menu.item href="{{ route('two-factor.settings') }}" icon="shield-check" wire:navigate>
+                            {{ __('Two-Factor Auth') }}
+                        </flux:menu.item>
+
+                        <flux:menu.separator />
+
+                        <flux:menu.item icon="arrow-right-start-on-rectangle" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            {{ __('Log Out') }}
+                        </flux:menu.item>
+                    </flux:menu>
+                </flux:dropdown>
             </div>
 
             <!-- Hamburger -->
@@ -89,13 +95,20 @@ new class extends Component
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800" x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
-                <div class="font-medium text-sm text-gray-500">{{ auth()->user()->email }}</div>
+                <flux:profile
+                    name="{{ auth()->user()->name }}"
+                    initials="{{ collect(explode(' ', auth()->user()->name))->map(fn($part) => Str::of($part)->substr(0, 1))->join('') }}"
+                />
+                <div class="font-medium text-sm text-gray-500 mt-2">{{ auth()->user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile')" wire:navigate>
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('two-factor.settings')" wire:navigate>
+                    {{ __('Two-Factor Auth') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

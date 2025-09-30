@@ -6,7 +6,6 @@
     <title>{{ $title ?? 'Personal CRM' }}</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <flux:brand />
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 min-h-screen">
     <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">

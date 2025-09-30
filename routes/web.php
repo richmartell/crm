@@ -8,9 +8,17 @@ use App\Livewire\ContactShow;
 use App\Livewire\ListForm;
 use App\Livewire\ListIndex;
 use App\Livewire\ListShow;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('contacts.index');
+    }
+
+    return redirect()->route('login');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/contacts', ContactList::class)->name('contacts.index');
@@ -18,16 +26,28 @@ Route::middleware('auth')->group(function () {
     Route::get('/contacts/{contact}', ContactShow::class)->name('contacts.show');
     Route::get('/contacts/{contact}/edit', ContactForm::class)->name('contacts.edit');
 
-    Route::get('/lists', ListIndex::class)->name('lists.index');
-    Route::get('/lists/create', ListForm::class)->name('lists.create');
-    Route::get('/lists/{list}', ListShow::class)->name('lists.show');
-    Route::get('/lists/{list}/edit', ListForm::class)->name('lists.edit');
+    Route::prefix('lists')->name('lists.')->group(function () {
+        Route::get('/', ListIndex::class)->name('index');
+        Route::get('create', ListForm::class)->name('create');
+        Route::get('{list}', ListShow::class)->whereNumber('list')->name('show');
+        Route::get('{list}/edit', ListForm::class)->whereNumber('list')->name('edit');
+    });
 
     Route::view('/profile', 'profile')->name('profile.edit');
 
     Route::get('/settings/two-factor', [TwoFactorController::class, 'create'])->name('two-factor.settings');
     Route::post('/settings/two-factor/enable', [TwoFactorController::class, 'store'])->name('two-factor.enable');
     Route::delete('/settings/two-factor/disable', [TwoFactorController::class, 'destroy'])->name('two-factor.disable');
+
+    Route::get('/logout', function (Request $request) {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        $request->session()->forget('needs_two_factor');
+
+        return redirect('/');
+    })->name('logout.get');
 });
 
 Route::middleware('auth')->group(function () {
