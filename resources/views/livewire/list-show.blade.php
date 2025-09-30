@@ -50,7 +50,7 @@
                 <flux:table>
                     <flux:table.columns>
                         <flux:table.column>Contact Name</flux:table.column>
-                        <flux:table.column></flux:table.column>
+                        <flux:table.column class="w-20"></flux:table.column>
                     </flux:table.columns>
                     <flux:table.rows>
                         @foreach($list->contacts as $contact)
@@ -60,7 +60,7 @@
                                         {{ $contact->full_name }}
                                     </a>
                                 </flux:table.cell>
-                                <flux:table.cell>
+                                <flux:table.cell class="text-right">
                                     <flux:button icon="trash" variant="ghost" size="sm" wire:click="removeContact({{ $contact->id }})" wire:confirm="Remove {{ $contact->full_name }} from this list?" />
                                 </flux:table.cell>
                             </flux:table.row>

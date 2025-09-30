@@ -30,31 +30,33 @@
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @foreach($lists as $list)
-                <flux:card href="{{ route('lists.show', $list) }}" class="hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex-1">
-                            <flux:heading size="lg">{{ $list->name }}</flux:heading>
-                            <flux:subheading>Created {{ $list->created_at->format('M j, Y') }}</flux:subheading>
+                <a href="{{ route('lists.show', $list) }}" class="block">
+                    <flux:card class="hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer h-full">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <flux:heading size="lg">{{ $list->name }}</flux:heading>
+                                <flux:subheading>Created {{ $list->created_at->format('M j, Y') }}</flux:subheading>
+                            </div>
+                            @if($list->archived_at)
+                                <flux:badge color="zinc" size="sm">Archived</flux:badge>
+                            @endif
                         </div>
-                        @if($list->archived_at)
-                            <flux:badge color="zinc" size="sm">Archived</flux:badge>
+                        
+                        @if($list->description)
+                            <flux:text class="mb-4">{{ Str::limit($list->description, 120) }}</flux:text>
                         @endif
-                    </div>
-                    
-                    @if($list->description)
-                        <flux:text class="mb-4">{{ Str::limit($list->description, 120) }}</flux:text>
-                    @endif
-                    
-                    <div class="flex items-center justify-between">
-                        <flux:badge color="blue" size="sm" icon="users">
-                            {{ $list->contacts()->count() }} contacts
-                        </flux:badge>
-                        <div class="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400">
-                            <flux:icon.arrow-right class="size-4" />
-                            <span>View list</span>
+                        
+                        <div class="flex items-center justify-between">
+                            <flux:badge color="blue" size="sm" icon="users">
+                                {{ $list->contacts()->count() }} contacts
+                            </flux:badge>
+                            <div class="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400">
+                                <flux:icon.arrow-right class="size-4" />
+                                <span>View list</span>
+                            </div>
                         </div>
-                    </div>
-                </flux:card>
+                    </flux:card>
+                </a>
             @endforeach
         </div>
 
