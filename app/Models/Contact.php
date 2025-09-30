@@ -35,7 +35,7 @@ class Contact extends Model
         'is_shared' => 'boolean',
     ];
 
-    protected $appends = ['full_name'];
+    protected $appends = ['full_name', 'avatar_url', 'initials'];
 
     protected static function booted()
     {
@@ -50,6 +50,28 @@ class Contact extends Model
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        // If they have uploaded a photo, use that
+        if ($this->photo) {
+            return \Storage::url($this->photo);
+        }
+
+        // If they have an email, try to get their Gravatar
+        if ($this->email) {
+            $hash = md5(strtolower(trim($this->email)));
+            return "https://www.gravatar.com/avatar/{$hash}?d=mp&s=200";
+        }
+
+        // No photo or email, return null (will use initials)
+        return null;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        return substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1);
     }
 
     // Relationship to user

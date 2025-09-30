@@ -56,22 +56,34 @@
                 <flux:heading size="lg" class="mb-4">Photo</flux:heading>
                 <flux:separator variant="subtle" class="mb-4" />
                 
-                @if($existingPhoto && !$photo)
-                    <div class="mb-4">
-                        <flux:avatar src="{{ Storage::url($existingPhoto) }}" size="xl" />
-                    </div>
-                @endif
-
-                @if($photo)
-                    <div class="mb-4">
+                <div class="mb-4">
+                    @if($photo)
                         <flux:avatar src="{{ $photo->temporaryUrl() }}" size="xl" />
-                    </div>
-                @endif
+                        <flux:text size="sm" class="mt-2">New photo preview</flux:text>
+                    @elseif($existingPhoto)
+                        <flux:avatar src="{{ Storage::url($existingPhoto) }}" size="xl" />
+                        <flux:text size="sm" class="mt-2">Current photo</flux:text>
+                    @elseif($email)
+                        @php
+                            $gravatarHash = md5(strtolower(trim($email)));
+                            $gravatarUrl = "https://www.gravatar.com/avatar/{$gravatarHash}?d=mp&s=200";
+                        @endphp
+                        <flux:avatar src="{{ $gravatarUrl }}" size="xl" />
+                        <flux:text size="sm" class="mt-2">Gravatar from email</flux:text>
+                    @else
+                        <flux:avatar size="xl" class="bg-gradient-to-br from-blue-500 to-purple-600">
+                            <span class="text-2xl font-bold text-white">
+                                {{ $first_name ? substr($first_name, 0, 1) : '' }}{{ $last_name ? substr($last_name, 0, 1) : '' }}
+                            </span>
+                        </flux:avatar>
+                        <flux:text size="sm" class="mt-2">Default avatar</flux:text>
+                    @endif
+                </div>
 
                 <flux:field>
                     <flux:label>Upload New Photo</flux:label>
                     <flux:input wire:model="photo" type="file" accept="image/*" />
-                    <flux:description>Maximum file size: 2MB</flux:description>
+                    <flux:description>Upload a photo or we'll use your Gravatar if you have one set up with your email address.</flux:description>
                     <flux:error name="photo" />
                 </flux:field>
             </div>

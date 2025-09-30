@@ -44,7 +44,8 @@ class ContactForm extends Component
                 ->visibleTo() // Only allow editing contacts visible to current user
                 ->findOrFail($id);
 
-            abort_unless($contact->user_id === Auth::id(), 403);
+            // Allow editing if user owns the contact OR if it's shared
+            abort_unless($contact->user_id === Auth::id() || $contact->is_shared, 403);
             
             $this->contactId = $contact->id;
             $this->first_name = $contact->first_name;
@@ -138,8 +139,12 @@ class ContactForm extends Component
         ];
 
         if ($this->contactId) {
+            // Allow updating if user owns the contact OR if it's shared
             $contact = Contact::where('id', $this->contactId)
-                ->where('user_id', Auth::id())
+                ->where(function($query) {
+                    $query->where('user_id', Auth::id())
+                          ->orWhere('is_shared', true);
+                })
                 ->firstOrFail();
             $contact->update($contactData);
             $message = 'Contact updated successfully.';
