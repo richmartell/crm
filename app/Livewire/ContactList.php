@@ -6,78 +6,55 @@ use App\Models\Contact;
 use App\Models\Tag;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 #[Layout('components.layout')]
 class ContactList extends Component
 {
-    use WithPagination;
+    public string $search = '';
+    public ?int $tagFilter = null;
+    public string $sortField = 'last_name';
+    public string $sortDirection = 'asc';
 
-    public $search = '';
-    public $selectedTag = null;
-    public $sortBy = 'first_name';
-    public $sortDirection = 'asc';
-
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'selectedTag' => ['except' => null],
-        'sortBy' => ['except' => 'first_name'],
-        'sortDirection' => ['except' => 'asc'],
-    ];
-
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatingSelectedTag()
+    public function updatingTagFilter(): void
     {
         $this->resetPage();
     }
 
-    public function sortByColumn($column)
+    public function sortBy(string $field): void
     {
-        if ($this->sortBy === $column) {
+        if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
-            $this->sortBy = $column;
+            $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
     }
 
-    public function clearFilters()
-    {
-        $this->search = '';
-        $this->selectedTag = null;
-        $this->resetPage();
-    }
-
-    public function deleteContact($contactId)
-    {
-        Contact::findOrFail($contactId)->delete();
-        session()->flash('success', 'Contact deleted successfully.');
-    }
-
     public function render()
     {
-        $query = Contact::query()->with(['address', 'tags']);
-
-        if ($this->search) {
-            $query->search($this->search);
-        }
-
-        if ($this->selectedTag) {
-            $query->withTag($this->selectedTag);
-        }
-
-        $contacts = $query->orderBy($this->sortBy, $this->sortDirection)
+        $contacts = Contact::query()
+            ->with(['tags', 'address'])
+            ->visibleTo()
+            ->when($this->search, function ($query) {
+                $query->where(function ($inner) {
+                    $inner->where('first_name', 'like', "%{$this->search}%")
+                          ->orWhere('last_name', 'like', "%{$this->search}%")
+                          ->orWhere('email', 'like', "%{$this->search}%")
+                          ->orWhere('phone_number', 'like', "%{$this->search}%");
+                });
+            })
+            ->when($this->tagFilter, fn ($query) => $query->whereHas('tags', fn ($tagQuery) => $tagQuery->where('tags.id', $this->tagFilter)))
+            ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(12);
-
-        $tags = Tag::all();
 
         return view('livewire.contact-list', [
             'contacts' => $contacts,
-            'tags' => $tags,
+            'tags' => Tag::orderBy('name')->get(),
         ]);
     }
 }

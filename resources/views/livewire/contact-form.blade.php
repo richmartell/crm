@@ -5,15 +5,15 @@
         </flux:button>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">
             {{ $contactId ? 'Edit Contact' : 'Create Contact' }}
         </h1>
 
         <form wire:submit="save">
             <!-- Basic Information -->
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <flux:input wire:model="first_name" label="First Name" required />
                     <flux:input wire:model="last_name" label="Last Name" required />
@@ -26,7 +26,7 @@
 
             <!-- Photo Upload -->
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Photo</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Photo</h2>
                 
                 @if($existingPhoto && !$photo)
                     <div class="mb-4">
@@ -46,7 +46,7 @@
 
             <!-- Address -->
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Address</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Address</h2>
                 
                 @if(!$createNewAddress && $addresses->isNotEmpty())
                     <div class="mb-4">
@@ -75,7 +75,7 @@
 
             <!-- Tags -->
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Tags</h2>
                 <div class="flex flex-wrap gap-3">
                     @foreach($tags as $tag)
                         <label class="inline-flex items-center cursor-pointer">
@@ -96,7 +96,7 @@
 
             <!-- Notes -->
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notes</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Notes</h2>
                 <flux:textarea wire:model="notes" label="Notes" rows="6" placeholder="Add any additional notes about this contact..." />
             </div>
 

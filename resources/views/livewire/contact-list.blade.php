@@ -1,114 +1,84 @@
 <div class="p-6 max-w-7xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Contacts</h1>
-        <p class="text-gray-600 dark:text-gray-400">Manage your personal and family contacts</p>
-    </div>
-
-    @if (session('success'))
-        <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
-            {{ session('success') }}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Contacts</h1>
+            <p class="text-gray-600 dark:text-gray-400">Manage your personal and shared relationships</p>
         </div>
-    @endif
-
-    <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div class="flex-1 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <flux:input 
-                wire:model.live.debounce.300ms="search" 
-                placeholder="Search contacts..." 
-                class="flex-1 min-w-64"
-                clearable
-            />
-            
-            <flux:select wire:model.live="selectedTag" placeholder="Filter by tag" class="w-full sm:w-48">
-                <option value="">All tags</option>
-                @foreach($tags as $tag)
-                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                @endforeach
-            </flux:select>
-            
-            @if($search || $selectedTag)
-                <flux:button wire:click="clearFilters" variant="ghost">
-                    Clear filters
-                </flux:button>
-            @endif
-        </div>
-
         <flux:button href="{{ route('contacts.create') }}" icon="plus" variant="primary">
             Add Contact
         </flux:button>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+        <div class="lg:col-span-2">
+            <flux:input wire:model.live.debounce.400ms="search" placeholder="Search contacts..." icon="magnifying-glass" />
+        </div>
+        <div>
+            <flux:select wire:model.live="tagFilter" placeholder="Filter by tag">
+                <option value="">All tags</option>
+                @foreach($tags as $tag)
+                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                @endforeach
+            </flux:select>
+        </div>
+        <div>
+            <flux:select wire:model.live="sortField" label="Sort by">
+                <option value="first_name">First name</option>
+                <option value="last_name">Last name</option>
+                <option value="created_at">Created date</option>
+            </flux:select>
+        </div>
+    </div>
+
     @if($contacts->isEmpty())
-        <div class="text-center py-16">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No contacts found</h3>
-            <p class="mt-1 text-sm text-gray-500">Get started by creating a new contact.</p>
+        <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-12 text-center">
+            <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40 mb-4">
+                <flux:icon name="users" class="size-6 text-blue-600 dark:text-blue-300" />
+            </div>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No contacts yet</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Start by adding someone you know.</p>
+            <flux:button href="{{ route('contacts.create') }}" variant="primary" icon="plus">
+                Create contact
+            </flux:button>
         </div>
     @else
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             @foreach($contacts as $contact)
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow overflow-hidden">
-                    <div class="p-6">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex-1">
-                                @if($contact->photo)
-                                    <img src="{{ Storage::url($contact->photo) }}" alt="{{ $contact->full_name }}" class="w-16 h-16 rounded-full object-cover mb-3">
-                                @else
-                                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mb-3">
-                                        <span class="text-white text-xl font-semibold">
-                                            {{ substr($contact->first_name, 0, 1) }}{{ substr($contact->last_name, 0, 1) }}
-                                        </span>
-                                    </div>
-                                @endif
-                                
-                                <a href="{{ route('contacts.show', $contact->id) }}" class="block">
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
-                                        {{ $contact->full_name }}
-                                    </h3>
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-5 flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                <a href="{{ route('contacts.show', $contact) }}" class="hover:underline">
+                                    {{ $contact->first_name }} {{ $contact->last_name }}
                                 </a>
-                                
-                                @if($contact->email)
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 truncate">{{ $contact->email }}</p>
-                                @endif
-                                
-                                @if($contact->phone_number)
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 truncate">{{ $contact->phone_number }}</p>
-                                @endif
-                            </div>
+                            </h2>
+                            <p class="text-sm text-gray-500">{{ $contact->email ?? 'No email' }}</p>
                         </div>
+                        <flux:badge :color="$contact->is_shared ? 'blue' : 'gray'">
+                            {{ $contact->is_shared ? 'Shared' : 'Personal' }}
+                        </flux:badge>
+                    </div>
 
-                        @if($contact->tags->isNotEmpty())
-                            <div class="flex flex-wrap gap-1 mb-4">
-                                @foreach($contact->tags as $tag)
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: {{ $tag->color }}20; color: {{ $tag->color }}">
-                                        {{ $tag->name }}
-                                    </span>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        @if($contact->address)
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 truncate">
-                                📍 {{ $contact->address->city }}{{ $contact->address->country ? ', ' . $contact->address->country : '' }}
-                            </p>
-                        @endif
-
-                        <div class="flex gap-2">
-                            <flux:button href="{{ route('contacts.edit', $contact->id) }}" size="sm" variant="ghost" class="flex-1">
-                                Edit
-                            </flux:button>
-                            <flux:button 
-                                wire:click="deleteContact({{ $contact->id }})" 
-                                wire:confirm="Are you sure you want to delete this contact?"
-                                size="sm" 
-                                variant="ghost"
-                                class="text-red-600 hover:text-red-700"
-                            >
-                                Delete
-                            </flux:button>
+                    @if($contact->phone_number)
+                        <div class="flex items-center text-gray-600 dark:text-gray-400 text-sm mb-2">
+                            <flux:icon name="phone" class="w-4 h-4 mr-2" />
+                            {{ $contact->phone_number }}
                         </div>
+                    @endif
+
+                    @if($contact->address)
+                        <div class="flex items-start text-gray-600 dark:text-gray-400 text-sm mb-3">
+                            <flux:icon name="map-pin" class="w-4 h-4 mr-2 mt-0.5" />
+                            <span>{{ $contact->address->formatted_address }}</span>
+                        </div>
+                    @endif
+
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                        @foreach($contact->tags as $tag)
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: {{ $tag->color }}20; color: {{ $tag->color }};">
+                                {{ $tag->name }}
+                            </span>
+                        @endforeach
                     </div>
                 </div>
             @endforeach

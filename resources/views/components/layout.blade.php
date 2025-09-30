@@ -8,8 +8,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <flux:brand />
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 min-h-screen">
-    <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-white border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -17,7 +17,7 @@
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        <span class="text-xl font-bold text-gray-900 dark:text-white">Personal CRM</span>
+                        <span class="text-xl font-bold text-gray-900">Personal CRM</span>
                     </a>
                 </div>
                 <div class="flex items-center gap-4">

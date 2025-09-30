@@ -13,10 +13,13 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "livewire/flux": "^2.5",
-        "livewire/livewire": "^3.6"
+        "livewire/livewire": "^3.6.4",
+        "livewire/volt": "^1.7.0",
+        "pragmarx/google2fa-laravel": "^2.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel/breeze": "*",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",
         "laravel/sail": "^1.41",
@@ -51,9 +54,6 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
-        ],
-        "pre-package-uninstall": [
-            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",

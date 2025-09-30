@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Models\ContactRelationship;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use App\Models\Tag;
 
 #[Layout('components.layout')]
 class ContactShow extends Component
@@ -15,10 +16,16 @@ class ContactShow extends Component
     public $relationshipType = '';
     public $relatedContactId = '';
 
-    public function mount($id)
+    public function mount(int $contact): void
     {
         $this->contact = Contact::with(['address', 'tags', 'relationships.relatedContact', 'inverseRelationships.contact'])
-            ->findOrFail($id);
+            ->visibleTo()
+            ->findOrFail($contact);
+
+        $this->availableContacts = Contact::visibleTo()
+            ->where('id', '!=', $this->contact->id)
+            ->orderBy('last_name')
+            ->get();
     }
 
     public function openRelationshipModal()
@@ -60,12 +67,6 @@ class ContactShow extends Component
 
     public function render()
     {
-        $availableContacts = Contact::where('id', '!=', $this->contact->id)
-            ->orderBy('first_name')
-            ->get();
-
-        return view('livewire.contact-show', [
-            'availableContacts' => $availableContacts,
-        ]);
+        return view('livewire.contact-show');
     }
 }

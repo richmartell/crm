@@ -7,12 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class Contact extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
+        'user_id',
+        'is_shared',
         'first_name',
         'last_name',
         'date_of_birth',
@@ -27,13 +31,30 @@ class Contact extends Model
     protected $casts = [
         'date_of_birth' => 'date',
         'anniversary_date' => 'date',
+        'is_shared' => 'boolean',
     ];
 
     protected $appends = ['full_name'];
 
+    protected static function booted()
+    {
+        // Automatically assign the authenticated user when creating a contact
+        static::creating(function ($contact) {
+            if (Auth::check() && ! $contact->user_id) {
+                $contact->user_id = Auth::id();
+            }
+        });
+    }
+
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    // Relationship to user
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     // Relationship to address (many contacts can share one address)
@@ -88,5 +109,35 @@ class Contact extends Model
         return $query->whereHas('tags', function ($q) use ($tagId) {
             $q->where('tags.id', $tagId);
         });
+    }
+
+    // Scope to filter contacts visible to the current user
+    public function scopeVisibleTo($query, ?User $user = null)
+    {
+        $user = $user ?: auth()->user();
+        
+        if (! $user) {
+            return $query->whereRaw('1 = 0'); // Return empty if no user
+        }
+
+        return $query->where(function ($inner) use ($user) {
+            $inner->where('user_id', $user->id)  // User's own contacts
+              ->orWhere('is_shared', true);    // Or shared contacts
+        });
+    }
+
+    // Scope for only personal contacts
+    public function scopePersonal($query, ?User $user = null)
+    {
+        $user = $user ?: auth()->user();
+        
+        return $query->where('user_id', optional($user)->id)
+                     ->where('is_shared', false);
+    }
+
+    // Scope for only shared contacts
+    public function scopeShared($query)
+    {
+        return $query->where('is_shared', true);
     }
 }

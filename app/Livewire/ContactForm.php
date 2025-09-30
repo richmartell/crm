@@ -8,6 +8,7 @@ use App\Models\Tag;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('components.layout')]
 class ContactForm extends Component
@@ -25,6 +26,7 @@ class ContactForm extends Component
     public $photo;
     public $existingPhoto = '';
     public $selectedTags = [];
+    public $is_shared = false;
     
     // Address fields
     public $address_id = null;
@@ -37,7 +39,12 @@ class ContactForm extends Component
     public function mount($id = null)
     {
         if ($id) {
-            $contact = Contact::with(['address', 'tags'])->findOrFail($id);
+            $contact = Contact::with(['address', 'tags'])
+                ->visibleTo() // Only allow editing contacts visible to current user
+                ->findOrFail($id);
+
+            abort_unless($contact->user_id === Auth::id(), 403);
+            
             $this->contactId = $contact->id;
             $this->first_name = $contact->first_name;
             $this->last_name = $contact->last_name;
@@ -48,6 +55,7 @@ class ContactForm extends Component
             $this->notes = $contact->notes;
             $this->existingPhoto = $contact->photo;
             $this->selectedTags = $contact->tags->pluck('id')->toArray();
+            $this->is_shared = $contact->is_shared;
             
             if ($contact->address) {
                 $this->address_id = $contact->address_id;
@@ -121,13 +129,17 @@ class ContactForm extends Component
             'notes' => $this->notes,
             'photo' => $photoPath,
             'address_id' => $addressId,
+            'is_shared' => $this->is_shared,
         ];
 
         if ($this->contactId) {
-            $contact = Contact::findOrFail($this->contactId);
+            $contact = Contact::where('id', $this->contactId)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $contact->update($contactData);
             $message = 'Contact updated successfully.';
         } else {
+            $contactData['user_id'] = Auth::id();
             $contact = Contact::create($contactData);
             $message = 'Contact created successfully.';
         }

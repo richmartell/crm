@@ -4,10 +4,16 @@
             Back to Contacts
         </flux:button>
         
-        <div class="flex gap-2">
-            <flux:button href="{{ route('contacts.edit', $contact->id) }}" icon="pencil">
-                Edit
-            </flux:button>
+        <div class="flex items-center gap-2">
+            <flux:badge :color="$contact->is_shared ? 'blue' : 'gray'">
+                {{ $contact->is_shared ? 'Shared contact' : 'Personal contact' }}
+            </flux:badge>
+
+            @if($contact->user_id === auth()->id())
+                <flux:button href="{{ route('contacts.edit', $contact->id) }}" icon="pencil">
+                    Edit
+                </flux:button>
+            @endif
         </div>
     </div>
 
@@ -114,9 +120,11 @@
         <div class="border-t border-gray-200 dark:border-gray-700 p-8">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Relationships</h2>
-                <flux:button wire:click="openRelationshipModal" icon="plus" size="sm">
-                    Add Relationship
-                </flux:button>
+                @if($contact->user_id === auth()->id())
+                    <flux:button wire:click="openRelationshipModal" icon="plus" size="sm">
+                        Add Relationship
+                    </flux:button>
+                @endif
             </div>
 
             @php

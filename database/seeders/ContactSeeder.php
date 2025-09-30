@@ -5,11 +5,21 @@ namespace Database\Seeders;
 use App\Models\Contact;
 use App\Models\ContactRelationship;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ContactSeeder extends Seeder
 {
     public function run(): void
+    {
+        $user = User::first();
+
+        if ($user) {
+            $this->seedForUser($user);
+        }
+    }
+
+    public function seedForUser(User $user, bool $limited = false): void
     {
         $familyTag = Tag::where('name', 'Family')->first();
         $friendsTag = Tag::where('name', 'Friends')->first();
@@ -17,8 +27,41 @@ class ContactSeeder extends Seeder
         $florenceSchoolTag = Tag::where('name', 'Florence School')->first();
         $workTag = Tag::where('name', 'Work')->first();
 
+        if ($limited) {
+            $contact1 = Contact::create([
+                'user_id' => $user->id,
+                'is_shared' => true,
+                'first_name' => 'Alice',
+                'last_name' => 'Johnson',
+                'date_of_birth' => '1990-03-15',
+                'email' => 'alice.johnson@example.com',
+                'phone_number' => '+44 20 7946 1234',
+                'notes' => 'Colleague from marketing department.',
+                'address_id' => 2,
+            ]);
+            $contact1->tags()->attach([$workTag?->id]);
+
+            $contact2 = Contact::create([
+                'user_id' => $user->id,
+                'is_shared' => false,
+                'first_name' => 'Bob',
+                'last_name' => 'Williams',
+                'date_of_birth' => '1985-07-22',
+                'email' => 'bob.williams@example.com',
+                'phone_number' => '+44 20 7946 5678',
+                'notes' => 'Old friend from college.',
+                'address_id' => 3,
+            ]);
+            $contact2->tags()->attach([$friendsTag?->id]);
+
+            return;
+        }
+
+        // Create full family for the main user
         // Create family members sharing the same address
         $john = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => false,
             'first_name' => 'John',
             'last_name' => 'Smith',
             'date_of_birth' => '1980-05-15',
@@ -31,6 +74,8 @@ class ContactSeeder extends Seeder
         $john->tags()->attach([$familyTag->id]);
 
         $sarah = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => false,
             'first_name' => 'Sarah',
             'last_name' => 'Smith',
             'date_of_birth' => '1982-08-22',
@@ -44,6 +89,8 @@ class ContactSeeder extends Seeder
 
         // Create children
         $emma = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => false,
             'first_name' => 'Emma',
             'last_name' => 'Smith',
             'date_of_birth' => '2010-03-12',
@@ -54,6 +101,8 @@ class ContactSeeder extends Seeder
         $emma->tags()->attach([$familyTag->id, $florenceSchoolTag->id]);
 
         $oliver = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => false,
             'first_name' => 'Oliver',
             'last_name' => 'Smith',
             'date_of_birth' => '2012-11-05',
@@ -137,6 +186,8 @@ class ContactSeeder extends Seeder
 
         // Create university friends
         $michael = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => true, // Shared contact
             'first_name' => 'Michael',
             'last_name' => 'Johnson',
             'date_of_birth' => '1981-02-14',
@@ -148,6 +199,8 @@ class ContactSeeder extends Seeder
         $michael->tags()->attach([$friendsTag->id, $richUniTag->id]);
 
         $lucy = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => true, // Shared contact
             'first_name' => 'Lucy',
             'last_name' => 'Williams',
             'date_of_birth' => '1982-09-30',
@@ -160,6 +213,8 @@ class ContactSeeder extends Seeder
 
         // Create work colleagues
         $david = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => false,
             'first_name' => 'David',
             'last_name' => 'Brown',
             'date_of_birth' => '1985-07-18',
@@ -171,6 +226,8 @@ class ContactSeeder extends Seeder
         $david->tags()->attach([$workTag->id]);
 
         $jessica = Contact::create([
+            'user_id' => $user->id,
+            'is_shared' => false,
             'first_name' => 'Jessica',
             'last_name' => 'Davis',
             'date_of_birth' => '1988-12-25',

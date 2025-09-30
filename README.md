@@ -355,3 +355,34 @@ This project is open-sourced software licensed under the [MIT license](https://o
 ---
 
 **Enjoy managing your personal contacts!** 🎉
+
+## Authentication & Two-Factor Login
+
+- Login and registration provided by Laravel Breeze + Livewire
+- Two-factor authentication (2FA) powered by Google Authenticator
+- 2FA setup page available under **Settings → Two-Factor Authentication**
+- After enabling 2FA you must enter a 6-digit code from your authenticator app when signing in
+- If you lose access to your authenticator app, disable 2FA from the settings page while signed in
+
+### Test Accounts
+
+| Email               | Password  | 2FA Enabled |
+|---------------------|-----------|-------------|
+| `john@example.com`  | `password`| Disabled    |
+| `jane@example.com`  | `password`| Disabled    |
+
+You can enable 2FA on either account from the settings page.
+
+## Contact Visibility Rules
+
+- Every contact belongs to the user who created it
+- When creating or editing a contact you can toggle **Share this contact with other users**
+- **Personal contacts** (`is_shared = false`) are visible only to the owner
+- **Shared contacts** (`is_shared = true`) are visible to all authenticated users
+- Only the owner of a contact can edit or delete it (even if it is shared)
+
+### Example Scenarios
+
+- John creates a personal contact → only John can view and edit it
+- John creates a shared contact → Jane can view the contact but only John can edit it
+- Jane enables 2FA → she must provide the code from her authenticator app on next login
