@@ -39,10 +39,10 @@
         <div class="xl:col-span-2 space-y-4">
             <div class="flex items-center gap-2">
                 <flux:icon.users class="size-5" />
-                <flux:heading size="lg">List Members ({{ $list->contacts->count() }})</flux:heading>
+                <flux:heading size="lg">List Members ({{ $listContacts->count() }})</flux:heading>
             </div>
 
-            @if($list->contacts->isEmpty())
+            @if($listContacts->isEmpty())
                 <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center">
                     <p class="text-gray-600 dark:text-gray-400">No contacts in this list yet. Add some from the right panel.</p>
                 </div>
@@ -53,7 +53,7 @@
                         <flux:table.column class="w-20"></flux:table.column>
                     </flux:table.columns>
                     <flux:table.rows>
-                        @foreach($list->contacts as $contact)
+                        @foreach($listContacts as $contact)
                             <flux:table.row :key="$contact->id">
                                 <flux:table.cell>
                                     <a href="{{ route('contacts.show', $contact) }}" class="font-medium text-gray-900 dark:text-white hover:underline">

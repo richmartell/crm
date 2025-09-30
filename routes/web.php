@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\TwoFactorController;
 use App\Livewire\ContactForm;
+use App\Livewire\TwoFactorSettings;
 use App\Livewire\ContactList;
 use App\Livewire\ContactShow;
 use App\Livewire\ListForm;
@@ -33,7 +34,7 @@ Route::middleware('auth')->group(function () {
 
     Route::view('/profile', 'profile')->name('profile.edit');
 
-    Route::get('/settings/two-factor', [TwoFactorController::class, 'create'])->name('two-factor.settings');
+    Route::get('/settings/two-factor', TwoFactorSettings::class)->name('two-factor.settings');
     Route::post('/settings/two-factor/enable', [TwoFactorController::class, 'store'])->name('two-factor.enable');
     Route::delete('/settings/two-factor/disable', [TwoFactorController::class, 'destroy'])->name('two-factor.disable');
 

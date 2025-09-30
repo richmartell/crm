@@ -25,9 +25,7 @@ class ListShow extends Component
     public function mount(ContactList $list): void
     {
         $this->ensureAuthorized($list);
-        $this->list = $list->load([
-            'contacts' => fn($query) => $query->orderBy('first_name')->orderBy('last_name')
-        ]);
+        $this->list = $list;
     }
 
     public function updatingContactSearch(): void
@@ -49,7 +47,7 @@ class ListShow extends Component
 
         $this->list->contacts()->syncWithoutDetaching($payload);
         $this->selectedContacts = [];
-        $this->list->refresh();
+        $this->reloadList();
         $this->dispatch('listUpdated');
         session()->flash('status', 'Contacts added to the list.');
     }
@@ -57,27 +55,40 @@ class ListShow extends Component
     public function removeContact(int $contactId): void
     {
         $this->list->contacts()->detach($contactId);
-        $this->list->refresh();
+        $this->reloadList();
         session()->flash('status', 'Contact removed from the list.');
+    }
+
+    protected function reloadList(): void
+    {
+        $this->list->refresh();
     }
 
     public function archive(): void
     {
         $this->list->archive();
-        $this->list->refresh();
+        $this->reloadList();
         session()->flash('status', 'List archived.');
     }
 
     public function restore(): void
     {
         $this->list->restore();
-        $this->list->refresh();
+        $this->reloadList();
         session()->flash('status', 'List restored.');
     }
 
     public function export(): void
     {
         // Placeholder for export implementation.
+    }
+
+    public function getListContactsProperty()
+    {
+        return $this->list->contacts()
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
     }
 
     public function getAvailableContactsProperty()
@@ -94,12 +105,13 @@ class ListShow extends Component
             ->orderBy('first_name')
             ->orderBy('last_name');
 
-        return $query->paginate(10, pageName: 'availableContacts');
+        return $query->paginate(8, pageName: 'availableContacts');
     }
 
     public function render()
     {
         return view('livewire.list-show', [
+            'listContacts' => $this->listContacts,
             'availableContacts' => $this->availableContacts,
         ]);
     }

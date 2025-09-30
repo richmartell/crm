@@ -46,13 +46,8 @@
                 <flux:profile avatar="{{ $avatar }}" name="{{ $user->name }}" />
                 
                 <flux:menu>
-                    <flux:menu.heading>{{ $user->name }}</flux:menu.heading>
                     <flux:menu.item icon="user" href="{{ route('profile.edit') }}">Profile</flux:menu.item>
                     <flux:menu.item icon="shield-check" href="{{ route('two-factor.settings') }}">Two-Factor Auth</flux:menu.item>
-                    
-                    <flux:menu.separator />
-                    
-                    <flux:menu.item icon="clipboard-document-list" href="{{ route('lists.index') }}">My Lists</flux:menu.item>
                     
                     <flux:menu.separator />
                     
