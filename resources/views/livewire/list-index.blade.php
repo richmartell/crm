@@ -1,8 +1,8 @@
-<div class="p-6 max-w-6xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div class="py-6 space-y-6">
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Lists</h1>
-            <p class="text-gray-600 dark:text-gray-400">Create and manage groups of contacts for events, holidays, and more.</p>
+            <flux:heading size="xl">Lists</flux:heading>
+            <flux:subheading>Create and manage groups of contacts for events, holidays, and more.</flux:subheading>
         </div>
         <flux:button href="{{ route('lists.create') }}" icon="plus" variant="primary">
             New List
@@ -17,45 +17,47 @@
     </div>
 
     @if($lists->isEmpty())
-        <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-12 text-center">
+        <flux:card class="text-center">
             <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40 mb-4">
-                <flux:icon name="clipboard-document-list" class="size-6 text-blue-600 dark:text-blue-300" />
+                <flux:icon.clipboard-document-list class="size-6 text-blue-600 dark:text-blue-300" />
             </div>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No lists found</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">Start by creating a new list for your next event.</p>
+            <flux:heading size="lg">No lists found</flux:heading>
+            <flux:subheading class="mb-6">Start by creating a new list for your next event.</flux:subheading>
             <flux:button href="{{ route('lists.create') }}" variant="primary" icon="plus">
                 Create list
             </flux:button>
-        </div>
+        </flux:card>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @foreach($lists as $list)
-                <a href="{{ route('lists.show', $list) }}" class="block rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-blue-500 transition">
+                <flux:card href="{{ route('lists.show', $list) }}" class="hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer">
                     <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $list->name }}</h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Created {{ $list->created_at->format('M j, Y') }}</p>
+                        <div class="flex-1">
+                            <flux:heading size="lg">{{ $list->name }}</flux:heading>
+                            <flux:subheading>Created {{ $list->created_at->format('M j, Y') }}</flux:subheading>
                         </div>
                         @if($list->archived_at)
-                            <flux:badge variant="subtle" color="gray">Archived</flux:badge>
+                            <flux:badge color="zinc" size="sm">Archived</flux:badge>
                         @endif
                     </div>
+                    
                     @if($list->description)
-                        <p class="text-gray-700 dark:text-gray-300 mb-4">{{ Str::limit($list->description, 120) }}</p>
+                        <flux:text class="mb-4">{{ Str::limit($list->description, 120) }}</flux:text>
                     @endif
-                    <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span>{{ $list->contacts()->count() }} contacts</span>
-                        <span class="flex items-center gap-1">
-                            <flux:icon name="arrow-right" class="size-4" />
-                            View list
-                        </span>
+                    
+                    <div class="flex items-center justify-between">
+                        <flux:badge color="blue" size="sm" icon="users">
+                            {{ $list->contacts()->count() }} contacts
+                        </flux:badge>
+                        <div class="flex items-center gap-1 text-sm text-zinc-600 dark:text-zinc-400">
+                            <flux:icon.arrow-right class="size-4" />
+                            <span>View list</span>
+                        </div>
                     </div>
-                </a>
+                </flux:card>
             @endforeach
         </div>
 
-        <div>
-            {{ $lists->links() }}
-        </div>
+        <flux:pagination :paginator="$lists" />
     @endif
 </div>

@@ -25,7 +25,9 @@ class ListShow extends Component
     public function mount(ContactList $list): void
     {
         $this->ensureAuthorized($list);
-        $this->list = $list->load(['contacts.tags']);
+        $this->list = $list->load([
+            'contacts' => fn($query) => $query->orderBy('first_name')->orderBy('last_name')
+        ]);
     }
 
     public function updatingContactSearch(): void
@@ -89,7 +91,8 @@ class ListShow extends Component
                         ->orWhere('email', 'like', "%{$this->contactSearch}%");
                 });
             })
-            ->orderBy('first_name');
+            ->orderBy('first_name')
+            ->orderBy('last_name');
 
         return $query->paginate(10, pageName: 'availableContacts');
     }

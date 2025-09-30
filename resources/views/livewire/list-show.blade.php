@@ -1,14 +1,14 @@
-<div class="p-6 max-w-6xl mx-auto space-y-6">
+<div class="py-6 space-y-6">
     <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
             <div class="flex items-center gap-3">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $list->name }}</h1>
+                <flux:heading size="xl">{{ $list->name }}</flux:heading>
                 @if($list->archived_at)
-                    <flux:badge variant="subtle" color="gray">Archived</flux:badge>
+                    <flux:badge color="zinc" size="sm">Archived</flux:badge>
                 @endif
             </div>
-            <p class="text-gray-600 dark:text-gray-400">{{ $list->description ?: 'No description provided.' }}</p>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Created {{ $list->created_at->format('F j, Y') }}</p>
+            <flux:subheading>{{ $list->description ?: 'No description provided.' }}</flux:subheading>
+            <flux:text size="sm" class="mt-1">Created {{ $list->created_at->format('F j, Y') }}</flux:text>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <flux:button href="{{ route('lists.edit', $list) }}" variant="ghost" icon="pencil">
@@ -30,74 +30,75 @@
     </div>
 
     @if (session('status'))
-        <div class="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/30 p-4 text-sm text-blue-700 dark:text-blue-200">
+        <flux:callout variant="success" icon="check-circle">
             {{ session('status') }}
-        </div>
+        </flux:callout>
     @endif
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div class="xl:col-span-2 space-y-4">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <flux:icon name="users" class="size-5" />
-                List Members ({{ $list->contacts->count() }})
-            </h2>
+            <div class="flex items-center gap-2">
+                <flux:icon.users class="size-5" />
+                <flux:heading size="lg">List Members ({{ $list->contacts->count() }})</flux:heading>
+            </div>
 
             @if($list->contacts->isEmpty())
                 <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center">
                     <p class="text-gray-600 dark:text-gray-400">No contacts in this list yet. Add some from the right panel.</p>
                 </div>
             @else
-                <div class="space-y-3">
-                    @foreach($list->contacts as $contact)
-                        <div class="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                            <div>
-                                <a href="{{ route('contacts.show', $contact) }}" class="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
-                                    {{ $contact->full_name }}
-                                </a>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $contact->email ?? 'No email' }} • {{ $contact->phone_number ?? 'No phone' }}
-                                </div>
-                                <div class="flex flex-wrap gap-2 mt-2">
-                                    @foreach($contact->tags as $tag)
-                                        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: {{ $tag->color }}20; color: {{ $tag->color }};">
-                                            {{ $tag->name }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <flux:button icon="trash" variant="ghost" wire:click="removeContact({{ $contact->id }})" wire:confirm="Remove {{ $contact->full_name }} from this list?" />
-                        </div>
-                    @endforeach
-                </div>
+                <flux:table>
+                    <flux:table.columns>
+                        <flux:table.column>Contact Name</flux:table.column>
+                        <flux:table.column></flux:table.column>
+                    </flux:table.columns>
+                    <flux:table.rows>
+                        @foreach($list->contacts as $contact)
+                            <flux:table.row :key="$contact->id">
+                                <flux:table.cell>
+                                    <a href="{{ route('contacts.show', $contact) }}" class="font-medium text-gray-900 dark:text-white hover:underline">
+                                        {{ $contact->full_name }}
+                                    </a>
+                                </flux:table.cell>
+                                <flux:table.cell>
+                                    <flux:button icon="trash" variant="ghost" size="sm" wire:click="removeContact({{ $contact->id }})" wire:confirm="Remove {{ $contact->full_name }} from this list?" />
+                                </flux:table.cell>
+                            </flux:table.row>
+                        @endforeach
+                    </flux:table.rows>
+                </flux:table>
             @endif
         </div>
 
         <div class="space-y-4">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <flux:icon name="plus-circle" class="size-5" />
-                Add Contacts
-            </h2>
-            <flux:input wire:model.debounce.300ms="contactSearch" placeholder="Search contacts..." icon="magnifying-glass" />
-
-            <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse($availableContacts as $contact)
-                    <label class="flex items-start gap-3 p-4">
-                        <flux:checkbox wire:model="selectedContacts" value="{{ $contact->id }}" />
-                        <div>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ $contact->full_name }}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $contact->email ?? 'No email' }}</p>
-                        </div>
-                    </label>
-                @empty
-                    <div class="p-4 text-sm text-gray-500 dark:text-gray-400">No contacts available to add.</div>
-                @endforelse
+            <div class="flex items-center gap-2">
+                <flux:icon.plus-circle class="size-5" />
+                <flux:heading size="lg">Add Contacts</flux:heading>
             </div>
+            <flux:input wire:model.live.debounce.300ms="contactSearch" placeholder="Search contacts..." icon="magnifying-glass" />
 
-            {{ $availableContacts->links() }}
+            @if($availableContacts->isEmpty())
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No contacts available to add.</p>
+                </div>
+            @else
+                <flux:checkbox.group wire:model="selectedContacts">
+                    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach($availableContacts as $contact)
+                            <label class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer">
+                                <flux:checkbox value="{{ $contact->id }}" />
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $contact->full_name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </flux:checkbox.group>
 
-            <flux:button variant="primary" icon="user-plus" class="w-full" wire:click="addContacts" :disabled="empty($selectedContacts)">
-                Add Selected Contacts
-            </flux:button>
+                <flux:pagination :paginator="$availableContacts" />
+
+                <flux:button variant="primary" icon="user-plus" class="w-full" wire:click="addContacts">
+                    Add Selected Contacts ({{ count($selectedContacts) }})
+                </flux:button>
+            @endif
         </div>
     </div>
 </div>

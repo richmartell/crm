@@ -25,13 +25,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/contacts/create', ContactForm::class)->name('contacts.create');
     Route::get('/contacts/{contact}', ContactShow::class)->name('contacts.show');
     Route::get('/contacts/{contact}/edit', ContactForm::class)->name('contacts.edit');
-
-    Route::prefix('lists')->name('lists.')->group(function () {
-        Route::get('/', ListIndex::class)->name('index');
-        Route::get('create', ListForm::class)->name('create');
-        Route::get('{list}', ListShow::class)->whereNumber('list')->name('show');
-        Route::get('{list}/edit', ListForm::class)->whereNumber('list')->name('edit');
-    });
+    
+    Route::get('/lists', ListIndex::class)->name('lists.index');
+    Route::get('/lists/create', ListForm::class)->name('lists.create');
+    Route::get('/lists/{list}', ListShow::class)->whereNumber('list')->name('lists.show');
+    Route::get('/lists/{list}/edit', ListForm::class)->whereNumber('list')->name('lists.edit');
 
     Route::view('/profile', 'profile')->name('profile.edit');
 
