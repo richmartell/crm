@@ -6,10 +6,12 @@ use App\Models\Contact;
 use App\Models\Tag;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('components.layout')]
 class ContactList extends Component
 {
+    use WithPagination;
     public string $search = '';
     public ?int $tagFilter = null;
     public string $sortField = 'last_name';
