@@ -24,7 +24,7 @@ class ListShow extends Component
 
     public function mount(ContactList $list): void
     {
-        $this->ensureAuthorized($list);
+        // Lists are now visible to all users
         $this->list = $list;
     }
 
@@ -85,7 +85,10 @@ class ListShow extends Component
 
     public function getListContactsProperty()
     {
+        // Show all contacts in the list, regardless of visibility
+        // The view will handle whether they're clickable or not
         return $this->list->contacts()
+            ->withoutGlobalScopes()
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->get();
@@ -116,8 +119,8 @@ class ListShow extends Component
         ]);
     }
 
-    protected function ensureAuthorized(ContactList $list): void
+    public function canAccessContact(Contact $contact): bool
     {
-        abort_unless($list->user_id === Auth::id(), 403);
+        return $contact->user_id === Auth::id() || $contact->is_shared;
     }
 }

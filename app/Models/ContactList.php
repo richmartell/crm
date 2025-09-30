@@ -46,7 +46,8 @@ class ContactList extends Model
             return $query->whereRaw('1 = 0');
         }
 
-        return $query->where('user_id', $user->id);
+        // All lists are visible to all authenticated users
+        return $query;
     }
 
     public function scopeActive($query)

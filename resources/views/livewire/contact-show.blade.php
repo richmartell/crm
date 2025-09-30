@@ -211,6 +211,56 @@
         @endif
     </flux:card>
 
+    <!-- Lists Section -->
+    <flux:card>
+        <div class="flex items-center justify-between mb-6">
+            <flux:heading size="lg" class="flex items-center gap-2">
+                <flux:icon.clipboard-document-list class="size-5" />
+                Lists
+            </flux:heading>
+        </div>
+        
+        <flux:separator variant="subtle" class="mb-6" />
+
+        @if($contact->lists->isEmpty())
+            <div class="text-center py-12">
+                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+                    <flux:icon.clipboard-document-list class="size-6 text-zinc-400" />
+                </div>
+                <flux:text class="text-zinc-500">Not added to any lists yet.</flux:text>
+            </div>
+        @else
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($contact->lists as $list)
+                    <a href="{{ route('lists.show', $list->id) }}" class="block group">
+                        <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <div class="flex-shrink-0">
+                                    <div class="size-10 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
+                                        <flux:icon.clipboard-document-list class="size-5 text-blue-600 dark:text-blue-400" />
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                                        {{ $list->name }}
+                                    </div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        @if($list->pivot->added_at)
+                                            Added {{ \Carbon\Carbon::parse($list->pivot->added_at)->format('M j, Y') }}
+                                        @else
+                                            Added recently
+                                        @endif
+                                    </div>
+                                </div>
+                                <flux:icon.arrow-right class="size-4 text-zinc-400 group-hover:text-blue-500 transition-colors flex-shrink-0 mt-1" />
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </flux:card>
+
     <!-- Add Relationship Modal -->
     @if($showRelationshipModal)
         <flux:modal wire:model="showRelationshipModal" class="space-y-6">

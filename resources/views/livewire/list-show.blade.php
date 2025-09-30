@@ -56,9 +56,16 @@
                         @foreach($listContacts as $contact)
                             <flux:table.row :key="$contact->id">
                                 <flux:table.cell>
-                                    <a href="{{ route('contacts.show', $contact) }}" class="font-medium text-gray-900 dark:text-white hover:underline">
-                                        {{ $contact->full_name }}
-                                    </a>
+                                    @if($contact->user_id === auth()->id() || $contact->is_shared)
+                                        <a href="{{ route('contacts.show', $contact) }}" class="font-medium text-gray-900 dark:text-white hover:underline">
+                                            {{ $contact->full_name }}
+                                        </a>
+                                    @else
+                                        <span class="font-medium text-gray-500 dark:text-gray-400" title="This contact is private">
+                                            {{ $contact->full_name }}
+                                        </span>
+                                        <flux:badge color="zinc" size="xs" class="ml-2">Private</flux:badge>
+                                    @endif
                                 </flux:table.cell>
                                 <flux:table.cell class="text-right">
                                     <flux:button icon="trash" variant="ghost" size="sm" wire:click="removeContact({{ $contact->id }})" wire:confirm="Remove {{ $contact->full_name }} from this list?" />

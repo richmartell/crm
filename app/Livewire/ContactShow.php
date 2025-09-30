@@ -26,7 +26,7 @@ class ContactShow extends Component
 
     public function mount(Contact $contact): void
     {
-        $this->contact = Contact::with(['address', 'tags', 'relationships.relatedContact', 'inverseRelationships.contact'])
+        $this->contact = Contact::with(['address', 'tags', 'relationships.relatedContact', 'inverseRelationships.contact', 'lists'])
             ->visibleTo()
             ->findOrFail($contact->id);
 
