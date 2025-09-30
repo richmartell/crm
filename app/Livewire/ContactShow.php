@@ -12,15 +12,16 @@ use App\Models\Tag;
 class ContactShow extends Component
 {
     public Contact $contact;
+    public $availableContacts = [];
     public $showRelationshipModal = false;
     public $relationshipType = '';
     public $relatedContactId = '';
 
-    public function mount(int $contact): void
+    public function mount(Contact $contact): void
     {
         $this->contact = Contact::with(['address', 'tags', 'relationships.relatedContact', 'inverseRelationships.contact'])
             ->visibleTo()
-            ->findOrFail($contact);
+            ->findOrFail($contact->id);
 
         $this->availableContacts = Contact::visibleTo()
             ->where('id', '!=', $this->contact->id)

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\ContactList;
 
 class Contact extends Model
 {
@@ -90,6 +91,13 @@ class Contact extends Model
             'contact_id',
             'related_contact_id'
         )->withPivot('relationship_type')->withTimestamps();
+    }
+
+    public function lists(): BelongsToMany
+    {
+        return $this->belongsToMany(ContactList::class, 'contact_list')
+            ->withPivot(['added_at'])
+            ->withTimestamps();
     }
 
     // Scope for searching contacts
