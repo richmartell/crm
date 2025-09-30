@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Personal CRM' }}</title>
     
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @fluxAppearance
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 min-h-screen">
     <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
@@ -43,25 +47,53 @@
                     @endauth
                     
                     @auth
-                        <flux:dropdown position="top" align="end">
-                            <flux:button variant="ghost" icon="user-circle">
-                                {{ Auth::user()->name }}
-                            </flux:button>
-                            
-                            <flux:menu>
-                                <flux:menu.item href="{{ route('profile.edit') }}" icon="user">Profile</flux:menu.item>
-                                <flux:menu.item href="{{ route('two-factor.settings') }}" icon="shield-check">Two-Factor Auth</flux:menu.item>
-                                <flux:menu.separator />
-                                <flux:menu.item 
-                                    wire:click="$dispatch('logout')" 
-                                    icon="arrow-right"
+                        @php
+                            $user = Auth::user();
+                            $avatar = sprintf('https://www.gravatar.com/avatar/%s?d=mp', md5(strtolower(trim($user->email))));
+                        @endphp
+        
+                        <flux:dropdown align="end">
+                            <flux:profile avatar="{{ $avatar }}" />
+
+                            <flux:navmenu class="max-w-[14rem]">
+                                <div class="px-2 py-1.5">
+                                    <flux:text size="sm">Signed in as</flux:text>
+                                    <flux:heading class="mt-1! truncate">{{ $user->name }}</flux:heading>
+                                    <flux:text size="sm" class="mt-0.5 truncate text-zinc-500 dark:text-zinc-400">{{ $user->email }}</flux:text>
+                                </div>
+
+                                <flux:navmenu.separator />
+
+                                <flux:navmenu.item href="{{ route('profile.edit') }}" icon="user" class="text-zinc-800 dark:text-white">
+                                    Profile
+                                </flux:navmenu.item>
+                                <flux:navmenu.item href="{{ route('two-factor.settings') }}" icon="shield-check" class="text-zinc-800 dark:text-white">
+                                    Two-Factor Auth
+                                </flux:navmenu.item>
+
+                                <flux:navmenu.separator />
+
+                                <flux:navmenu.item
+                                    href="{{ route('lists.index') }}"
+                                    icon="clipboard-document-list"
+                                    class="text-zinc-800 dark:text-white"
+                                >
+                                    My Lists
+                                </flux:navmenu.item>
+
+                                <flux:navmenu.separator />
+
+                                <flux:navmenu.item
+                                    href="{{ route('logout') }}"
+                                    icon="arrow-right-start-on-rectangle"
+                                    class="text-zinc-800 dark:text-white"
                                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                 >
                                     Logout
-                                </flux:menu.item>
-                            </flux:menu>
+                                </flux:navmenu.item>
+                            </flux:navmenu>
                         </flux:dropdown>
-                        
+
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
@@ -74,5 +106,6 @@
     <main>
         {{ $slot }}
     </main>
+    @fluxScripts
 </body>
 </html>
