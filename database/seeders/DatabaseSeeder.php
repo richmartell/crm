@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             AddressSeeder::class,
             TagSeeder::class,
             ContactSeeder::class,
+            ListSeeder::class,
         ]);
 
         $contactSeeder = new ContactSeeder();

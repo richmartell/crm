@@ -95,7 +95,7 @@ class Contact extends Model
 
     public function lists(): BelongsToMany
     {
-        return $this->belongsToMany(ContactList::class, 'contact_list')
+        return $this->belongsToMany(ContactList::class, 'contact_list', 'contact_id', 'list_id')
             ->withPivot(['added_at'])
             ->withTimestamps();
     }
