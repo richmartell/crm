@@ -37,12 +37,12 @@ class ContactForm extends Component
     public $country = '';
     public $createNewAddress = false;
 
-    public function mount($id = null)
+    public function mount($contact = null)
     {
-        if ($id) {
+        if ($contact) {
             $contact = Contact::with(['address', 'tags'])
                 ->visibleTo() // Only allow editing contacts visible to current user
-                ->findOrFail($id);
+                ->findOrFail($contact);
 
             // Allow editing if user owns the contact OR if it's shared
             abort_unless($contact->user_id === Auth::id() || $contact->is_shared, 403);
