@@ -12,6 +12,11 @@ class Tag extends Model
         'color',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     // Relationship to contacts
     public function contacts(): BelongsToMany
     {

@@ -34,9 +34,5 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,
             ListSeeder::class,
         ]);
-
-        $contactSeeder = new ContactSeeder();
-        $contactSeeder->seedForUser($user1);
-        $contactSeeder->seedForUser($user2, true);
     }
 }

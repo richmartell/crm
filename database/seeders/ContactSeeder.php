@@ -6,249 +6,108 @@ use App\Models\Contact;
 use App\Models\ContactRelationship;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\Address;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class ContactSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::first();
+        $faker = Faker::create('en_GB');
+        $users = User::all();
+        $tags = Tag::all();
+        $addresses = Address::all();
 
-        if ($user) {
-            $this->seedForUser($user);
-        }
-    }
-
-    public function seedForUser(User $user, bool $limited = false): void
-    {
-        $familyTag = Tag::where('name', 'Family')->first();
-        $friendsTag = Tag::where('name', 'Friends')->first();
-        $richUniTag = Tag::where('name', 'Rich Uni')->first();
-        $florenceSchoolTag = Tag::where('name', 'Florence School')->first();
-        $workTag = Tag::where('name', 'Work')->first();
-
-        if ($limited) {
-            $contact1 = Contact::create([
-                'user_id' => $user->id,
-                'is_shared' => true,
-                'first_name' => 'Alice',
-                'last_name' => 'Johnson',
-                'date_of_birth' => '1990-03-15',
-                'email' => 'alice.johnson@example.com',
-                'phone_number' => '+44 20 7946 1234',
-                'notes' => 'Colleague from marketing department.',
-                'address_id' => 2,
-            ]);
-            $contact1->tags()->attach([$workTag?->id]);
-
-            $contact2 = Contact::create([
-                'user_id' => $user->id,
-                'is_shared' => false,
-                'first_name' => 'Bob',
-                'last_name' => 'Williams',
-                'date_of_birth' => '1985-07-22',
-                'email' => 'bob.williams@example.com',
-                'phone_number' => '+44 20 7946 5678',
-                'notes' => 'Old friend from college.',
-                'address_id' => 3,
-            ]);
-            $contact2->tags()->attach([$friendsTag?->id]);
-
+        if ($users->isEmpty()) {
             return;
         }
 
-        // Create full family for the main user
-        // Create family members sharing the same address
-        $john = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => false,
-            'first_name' => 'John',
-            'last_name' => 'Smith',
-            'date_of_birth' => '1980-05-15',
-            'anniversary_date' => '2005-06-20',
-            'email' => 'john.smith@example.com',
-            'phone_number' => '+44 20 7946 0958',
-            'notes' => 'My spouse. Works as a software engineer. Loves hiking and photography.',
-            'address_id' => 1,
-        ]);
-        $john->tags()->attach([$familyTag->id]);
+        // Generate 120 contacts across all users
+        $contactsToCreate = 120;
+        $contactsPerUser = ceil($contactsToCreate / $users->count());
 
-        $sarah = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => false,
-            'first_name' => 'Sarah',
-            'last_name' => 'Smith',
-            'date_of_birth' => '1982-08-22',
-            'anniversary_date' => '2005-06-20',
-            'email' => 'sarah.smith@example.com',
-            'phone_number' => '+44 20 7946 0959',
-            'notes' => 'Doctor at St. Mary\'s Hospital. Very organized and caring.',
-            'address_id' => 1,
-        ]);
-        $sarah->tags()->attach([$familyTag->id]);
+        foreach ($users as $userIndex => $user) {
+            $contacts = [];
+            
+            // Determine how many contacts this user should have
+            $numContacts = min($contactsPerUser, $contactsToCreate - (count($contacts) * $userIndex));
+            
+            for ($i = 0; $i < $numContacts; $i++) {
+                // Randomly decide if contact should be shared (30% chance)
+                $isShared = $faker->boolean(30);
+                
+                // Generate a birthday (spread across all months for good birthday page testing)
+                $birthday = $faker->dateTimeBetween('-80 years', '-18 years')->format('Y-m-d');
+                
+                // 30% chance of having an anniversary date
+                $anniversaryDate = $faker->boolean(30) 
+                    ? $faker->dateTimeBetween('-30 years', 'now')->format('Y-m-d')
+                    : null;
+                
+                $contact = Contact::create([
+                    'user_id' => $user->id,
+                    'is_shared' => $isShared,
+                    'first_name' => $faker->firstName,
+                    'last_name' => $faker->lastName,
+                    'date_of_birth' => $birthday,
+                    'anniversary_date' => $anniversaryDate,
+                    'email' => $faker->unique()->email,
+                    'phone_number' => $faker->boolean(80) ? $faker->phoneNumber : null,
+                    'notes' => $faker->boolean(40) ? $faker->sentence(10) : null,
+                    'address_id' => $faker->boolean(70) ? $addresses->random()->id : null,
+                ]);
 
-        // Create children
-        $emma = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => false,
-            'first_name' => 'Emma',
-            'last_name' => 'Smith',
-            'date_of_birth' => '2010-03-12',
-            'email' => 'emma.smith@example.com',
-            'notes' => 'Daughter. Loves art and music. Attending Florence School.',
-            'address_id' => 1,
-        ]);
-        $emma->tags()->attach([$familyTag->id, $florenceSchoolTag->id]);
+                // Attach 1-3 random tags to some contacts
+                if ($faker->boolean(60)) {
+                    $numTags = $faker->numberBetween(1, 3);
+                    $contact->tags()->attach($tags->random($numTags)->pluck('id'));
+                }
 
-        $oliver = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => false,
-            'first_name' => 'Oliver',
-            'last_name' => 'Smith',
-            'date_of_birth' => '2012-11-05',
-            'notes' => 'Son. Passionate about football and video games.',
-            'address_id' => 1,
-        ]);
-        $oliver->tags()->attach([$familyTag->id, $florenceSchoolTag->id]);
+                $contacts[] = $contact;
+            }
 
-        // Create relationships
-        ContactRelationship::create([
-            'contact_id' => $john->id,
-            'related_contact_id' => $sarah->id,
-            'relationship_type' => 'spouse',
-        ]);
+            // Create some relationships between contacts (10% of contacts)
+            $numRelationships = (int)($numContacts * 0.1);
+            for ($i = 0; $i < $numRelationships; $i++) {
+                if (count($contacts) < 2) break;
 
-        ContactRelationship::create([
-            'contact_id' => $sarah->id,
-            'related_contact_id' => $john->id,
-            'relationship_type' => 'spouse',
-        ]);
+                $contact1 = $faker->randomElement($contacts);
+                $contact2 = $faker->randomElement($contacts);
 
-        ContactRelationship::create([
-            'contact_id' => $john->id,
-            'related_contact_id' => $emma->id,
-            'relationship_type' => 'child',
-        ]);
+                // Make sure we don't create a relationship with itself
+                if ($contact1->id === $contact2->id) continue;
 
-        ContactRelationship::create([
-            'contact_id' => $sarah->id,
-            'related_contact_id' => $emma->id,
-            'relationship_type' => 'child',
-        ]);
+                // Check if relationship already exists
+                $existingRelationship = ContactRelationship::where('contact_id', $contact1->id)
+                    ->where('related_contact_id', $contact2->id)
+                    ->exists();
 
-        ContactRelationship::create([
-            'contact_id' => $john->id,
-            'related_contact_id' => $oliver->id,
-            'relationship_type' => 'child',
-        ]);
+                if (!$existingRelationship) {
+                    $relationshipTypes = ['Parent', 'Child', 'Spouse'];
+                    $type = $faker->randomElement($relationshipTypes);
+                    
+                    // Create primary relationship
+                    ContactRelationship::create([
+                        'contact_id' => $contact1->id,
+                        'related_contact_id' => $contact2->id,
+                        'relationship_type' => $type,
+                    ]);
 
-        ContactRelationship::create([
-            'contact_id' => $sarah->id,
-            'related_contact_id' => $oliver->id,
-            'relationship_type' => 'child',
-        ]);
+                    // Create reciprocal relationship
+                    $reciprocals = [
+                        'Parent' => 'Child',
+                        'Child' => 'Parent',
+                        'Spouse' => 'Spouse',
+                    ];
 
-        ContactRelationship::create([
-            'contact_id' => $emma->id,
-            'related_contact_id' => $john->id,
-            'relationship_type' => 'parent',
-        ]);
-
-        ContactRelationship::create([
-            'contact_id' => $emma->id,
-            'related_contact_id' => $sarah->id,
-            'relationship_type' => 'parent',
-        ]);
-
-        ContactRelationship::create([
-            'contact_id' => $oliver->id,
-            'related_contact_id' => $john->id,
-            'relationship_type' => 'parent',
-        ]);
-
-        ContactRelationship::create([
-            'contact_id' => $oliver->id,
-            'related_contact_id' => $sarah->id,
-            'relationship_type' => 'parent',
-        ]);
-
-        ContactRelationship::create([
-            'contact_id' => $emma->id,
-            'related_contact_id' => $oliver->id,
-            'relationship_type' => 'sibling',
-        ]);
-
-        ContactRelationship::create([
-            'contact_id' => $oliver->id,
-            'related_contact_id' => $emma->id,
-            'relationship_type' => 'sibling',
-        ]);
-
-        // Create university friends
-        $michael = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => true, // Shared contact
-            'first_name' => 'Michael',
-            'last_name' => 'Johnson',
-            'date_of_birth' => '1981-02-14',
-            'email' => 'michael.johnson@example.com',
-            'phone_number' => '+44 161 496 0000',
-            'notes' => 'Met at Rich University. Now works in finance. Great sense of humor.',
-            'address_id' => 2,
-        ]);
-        $michael->tags()->attach([$friendsTag->id, $richUniTag->id]);
-
-        $lucy = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => true, // Shared contact
-            'first_name' => 'Lucy',
-            'last_name' => 'Williams',
-            'date_of_birth' => '1982-09-30',
-            'email' => 'lucy.williams@example.com',
-            'phone_number' => '+44 121 496 0000',
-            'notes' => 'Best friend from Rich University. Marketing director. Always up for coffee.',
-            'address_id' => 3,
-        ]);
-        $lucy->tags()->attach([$friendsTag->id, $richUniTag->id]);
-
-        // Create work colleagues
-        $david = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => false,
-            'first_name' => 'David',
-            'last_name' => 'Brown',
-            'date_of_birth' => '1985-07-18',
-            'email' => 'david.brown@example.com',
-            'phone_number' => '+44 131 496 0000',
-            'notes' => 'Work colleague. Team lead. Very knowledgeable about tech.',
-            'address_id' => 4,
-        ]);
-        $david->tags()->attach([$workTag->id]);
-
-        $jessica = Contact::create([
-            'user_id' => $user->id,
-            'is_shared' => false,
-            'first_name' => 'Jessica',
-            'last_name' => 'Davis',
-            'date_of_birth' => '1988-12-25',
-            'email' => 'jessica.davis@example.com',
-            'phone_number' => '+44 117 496 0000',
-            'notes' => 'Project manager at work. Very organized and professional.',
-            'address_id' => 5,
-        ]);
-        $jessica->tags()->attach([$workTag->id]);
-
-        // Create some friend relationships
-        ContactRelationship::create([
-            'contact_id' => $john->id,
-            'related_contact_id' => $michael->id,
-            'relationship_type' => 'friend',
-        ]);
-
-        ContactRelationship::create([
-            'contact_id' => $sarah->id,
-            'related_contact_id' => $lucy->id,
-            'relationship_type' => 'friend',
-        ]);
+                    ContactRelationship::create([
+                        'contact_id' => $contact2->id,
+                        'related_contact_id' => $contact1->id,
+                        'relationship_type' => $reciprocals[$type],
+                    ]);
+                }
+            }
+        }
     }
 }

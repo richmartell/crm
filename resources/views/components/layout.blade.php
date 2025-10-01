@@ -54,6 +54,7 @@
                 
                 <flux:menu>
                     <flux:menu.item icon="user" href="{{ route('profile.edit') }}">Profile</flux:menu.item>
+                    <flux:menu.item icon="tag" href="{{ route('tags.index') }}">Tags</flux:menu.item>
                     <flux:menu.item icon="shield-check" href="{{ route('two-factor.settings') }}">Two-Factor Auth</flux:menu.item>
                     
                     <flux:menu.separator />
@@ -109,6 +110,7 @@
 
             <flux:sidebar.nav>
                 <flux:sidebar.item icon="user" href="{{ route('profile.edit') }}">Profile</flux:sidebar.item>
+                <flux:sidebar.item icon="tag" href="{{ route('tags.index') }}">Tags</flux:sidebar.item>
                 <flux:sidebar.item icon="shield-check" href="{{ route('two-factor.settings') }}">Settings</flux:sidebar.item>
             </flux:sidebar.nav>
         </flux:sidebar>

@@ -38,7 +38,7 @@ class ContactList extends Model
             ->withTimestamps();
     }
 
-    public function scopeVisibleTo($query, User $user = null)
+    public function scopeVisibleTo($query, ?User $user = null)
     {
         $user = $user ?: auth()->user();
 

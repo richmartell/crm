@@ -10,6 +10,7 @@ use App\Livewire\ContactShow;
 use App\Livewire\ListForm;
 use App\Livewire\ListIndex;
 use App\Livewire\ListShow;
+use App\Livewire\TagIndex;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/lists/create', ListForm::class)->name('lists.create');
     Route::get('/lists/{list}', ListShow::class)->whereNumber('list')->name('lists.show');
     Route::get('/lists/{list}/edit', ListForm::class)->whereNumber('list')->name('lists.edit');
+
+    Route::get('/tags', TagIndex::class)->name('tags.index');
 
     Route::view('/profile', 'profile')->name('profile.edit');
 
