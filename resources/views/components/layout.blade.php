@@ -31,7 +31,7 @@
                     href="{{ route('birthdays.index') }}"
                     :current="request()->routeIs('birthdays.*')"
                 >
-                    Birthdays
+                    Birthdays & Anniversaries
                 </flux:navbar.item>
                 <flux:navbar.item 
                     icon="clipboard-document-list" 
@@ -95,7 +95,7 @@
                     href="{{ route('birthdays.index') }}"
                     :current="request()->routeIs('birthdays.*')"
                 >
-                    Birthdays
+                    Birthdays & Anniversaries
                 </flux:sidebar.item>
                 <flux:sidebar.item 
                     icon="clipboard-document-list" 
