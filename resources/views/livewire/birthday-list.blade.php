@@ -1,7 +1,7 @@
 <div class="py-6 space-y-6">
     <div>
         <flux:heading size="xl">Birthdays & Anniversaries</flux:heading>
-        <flux:subheading>Upcoming celebrations in the next 3 months</flux:subheading>
+        <flux:subheading>Upcoming celebrations in the next year</flux:subheading>
     </div>
 
     @if($events->isEmpty())
@@ -10,7 +10,7 @@
                 <flux:icon.cake class="size-6 text-blue-600 dark:text-blue-300" />
             </div>
             <flux:heading size="lg">No upcoming events</flux:heading>
-            <flux:subheading>No birthdays or anniversaries in the next 3 months.</flux:subheading>
+            <flux:subheading>No birthdays or anniversaries in the next year.</flux:subheading>
         </flux:card>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

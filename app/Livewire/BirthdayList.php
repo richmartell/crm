@@ -14,7 +14,7 @@ class BirthdayList extends Component
     public function getBirthdaysProperty(): Collection
     {
         $today = Carbon::today();
-        $threeMonthsFromNow = Carbon::today()->addMonths(3);
+        $oneYearFromNow = Carbon::today()->addYear();
         
         // Get all contacts with birthdays
         $contacts = Contact::visibleTo()
@@ -46,9 +46,9 @@ class BirthdayList extends Component
                 
                 return $contact;
             })
-            ->filter(function ($contact) use ($threeMonthsFromNow) {
-                // Only include birthdays in the next 3 months
-                return $contact->upcoming_date->lte($threeMonthsFromNow);
+            ->filter(function ($contact) use ($oneYearFromNow) {
+                // Only include birthdays in the next year
+                return $contact->upcoming_date->lte($oneYearFromNow);
             });
         
         return $contacts;
@@ -57,7 +57,7 @@ class BirthdayList extends Component
     public function getAnniversariesProperty(): Collection
     {
         $today = Carbon::today();
-        $threeMonthsFromNow = Carbon::today()->addMonths(3);
+        $oneYearFromNow = Carbon::today()->addYear();
         
         // Get all contacts with anniversaries
         $anniversaries = Contact::visibleTo()
@@ -97,9 +97,9 @@ class BirthdayList extends Component
                 
                 return $contact;
             })
-            ->filter(function ($contact) use ($threeMonthsFromNow) {
-                // Only include anniversaries in the next 3 months
-                return $contact->upcoming_date->lte($threeMonthsFromNow);
+            ->filter(function ($contact) use ($oneYearFromNow) {
+                // Only include anniversaries in the next year
+                return $contact->upcoming_date->lte($oneYearFromNow);
             });
         
         // Remove duplicate anniversaries (if both spouses have the same date)
