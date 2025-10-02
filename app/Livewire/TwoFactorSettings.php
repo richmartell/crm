@@ -22,14 +22,16 @@ class TwoFactorSettings extends Component
         $user = Auth::user();
 
         $this->enabled = (bool) $user->two_factor_enabled;
-        $this->secret = Session::get('two_factor_secret');
+        $sessionSecret = Session::get('two_factor_secret');
 
-        if (! $this->secret) {
-            $this->secret = $this->enabled
+        if (! $sessionSecret) {
+            $this->secret = $this->enabled && $user->two_factor_secret
                 ? Crypt::decryptString($user->two_factor_secret)
                 : (new Google2FA())->generateSecretKey();
 
             Session::put('two_factor_secret', $this->secret);
+        } else {
+            $this->secret = $sessionSecret;
         }
 
         $this->qrCodeUrl = (new Google2FA())
