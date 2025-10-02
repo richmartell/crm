@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\TwoFactorController;
 use App\Livewire\BirthdayList;
 use App\Livewire\ContactForm;
+use App\Livewire\ContactImport;
 use App\Livewire\TwoFactorSettings;
 use App\Livewire\ContactList;
 use App\Livewire\ContactShow;
@@ -26,6 +27,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/contacts', ContactList::class)->name('contacts.index');
     Route::get('/contacts/create', ContactForm::class)->name('contacts.create');
+    Route::get('/contacts/import', ContactImport::class)->name('contacts.import');
     Route::get('/contacts/{contact}', ContactShow::class)->name('contacts.show');
     Route::get('/contacts/{contact}/edit', ContactForm::class)->name('contacts.edit');
     

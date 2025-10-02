@@ -4,9 +4,14 @@
             <flux:heading size="xl">Contacts</flux:heading>
             <flux:subheading>Manage your personal and shared relationships</flux:subheading>
         </div>
-        <flux:button href="{{ route('contacts.create') }}" icon="plus" variant="primary">
-            Add Contact
-        </flux:button>
+        <div class="flex gap-2">
+            <flux:button href="{{ route('contacts.import') }}" icon="arrow-up-tray" variant="ghost">
+                Import
+            </flux:button>
+            <flux:button href="{{ route('contacts.create') }}" icon="plus" variant="primary">
+                Add Contact
+            </flux:button>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
