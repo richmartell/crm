@@ -37,6 +37,27 @@ class ContactForm extends Component
     public $country = '';
     public $createNewAddress = false;
 
+    public function updatedAddressId($value)
+    {
+        if ($value && !$this->createNewAddress) {
+            $address = Address::find($value);
+            if ($address) {
+                $this->street = $address->street;
+                $this->address_line_2 = $address->address_line_2;
+                $this->city = $address->city;
+                $this->postcode = $address->postcode;
+                $this->country = $address->country;
+            }
+        } elseif (!$value) {
+            // Clear fields when "None" is selected
+            $this->street = '';
+            $this->address_line_2 = '';
+            $this->city = '';
+            $this->postcode = '';
+            $this->country = '';
+        }
+    }
+
     public function mount($contact = null)
     {
         if ($contact) {
@@ -164,7 +185,20 @@ class ContactForm extends Component
     public function render()
     {
         $tags = Tag::all();
-        $addresses = Address::all();
+        
+        // Get unique addresses ordered alphabetically
+        // Group by all address fields to identify true duplicates
+        $addresses = Address::select('addresses.*')
+            ->selectRaw('CONCAT_WS(", ", street, address_line_2, city, postcode, country) as full_address')
+            ->groupBy('street', 'address_line_2', 'city', 'postcode', 'country', 'addresses.id', 'addresses.created_at', 'addresses.updated_at')
+            ->orderBy('city')
+            ->orderBy('street')
+            ->get()
+            ->unique(function ($address) {
+                // Remove duplicates based on the actual address content
+                return strtolower(trim($address->formatted_address));
+            })
+            ->values();
 
         return view('livewire.contact-form', [
             'tags' => $tags,
