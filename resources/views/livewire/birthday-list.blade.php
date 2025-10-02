@@ -73,14 +73,27 @@
                             @else
                                 {{-- Anniversary --}}
                                 <div class="font-semibold text-zinc-900 dark:text-white text-lg">
-                                    <a href="{{ route('contacts.show', $event) }}" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
-                                        {{ $event->full_name }}
-                                    </a>
-                                    @if($event->spouse)
-                                        <span class="text-zinc-500 dark:text-zinc-400"> & </span>
-                                        <a href="{{ route('contacts.show', $event->spouse) }}" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
-                                            {{ $event->spouse->full_name }}
+                                    @if($event->spouse && $event->last_name === $event->spouse->last_name)
+                                        {{-- Same surname - show "FirstName1 and FirstName2 Surname" --}}
+                                        <a href="{{ route('contacts.show', $event) }}" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
+                                            {{ $event->first_name }}
                                         </a>
+                                        <span class="text-zinc-500 dark:text-zinc-400"> and </span>
+                                        <a href="{{ route('contacts.show', $event->spouse) }}" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
+                                            {{ $event->spouse->first_name }}
+                                        </a>
+                                        <span> {{ $event->last_name }}</span>
+                                    @else
+                                        {{-- Different surnames or no spouse - show full names --}}
+                                        <a href="{{ route('contacts.show', $event) }}" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
+                                            {{ $event->full_name }}
+                                        </a>
+                                        @if($event->spouse)
+                                            <span class="text-zinc-500 dark:text-zinc-400"> & </span>
+                                            <a href="{{ route('contacts.show', $event->spouse) }}" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
+                                                {{ $event->spouse->full_name }}
+                                            </a>
+                                        @endif
                                     @endif
                                 </div>
                                 
